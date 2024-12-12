@@ -38,7 +38,7 @@ func (s *booksService) GetBooks(ctx context.Context) ([]domain.Book, error) {
 }
 
 func (s *booksService) SaveBook(ctx context.Context, book domain.Book) error {
-	dbBook := database.Book{
+	dbBook := database.NewBook{
 		Title: book.Title,
 	}
 

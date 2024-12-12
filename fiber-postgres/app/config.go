@@ -1,6 +1,9 @@
 package main
 
-import "os"
+import (
+	"log/slog"
+	"os"
+)
 
 type Configuration struct {
 	Port        string
@@ -8,9 +11,13 @@ type Configuration struct {
 }
 
 func NewConfiguration() *Configuration {
+	dbURL := getEnvOrDefault("DATABASE_URL", "")
+	if dbURL == "" {
+		slog.Warn("DATABASE_URL is not set")
+	}
 	return &Configuration{
 		Port:        getEnvOrDefault("PORT", "3000"),
-		DatabaseURL: getEnvOrDefault("DATABASE_URL", ""),
+		DatabaseURL: dbURL,
 	}
 }
 

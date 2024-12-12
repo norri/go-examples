@@ -16,11 +16,11 @@ type PostgresPool interface {
 }
 
 func newPostgresDB(ctx context.Context, databaseURL string) (Database, error) {
+	// For production use set connection pool settings and validate connection with ping
 	dbpool, err := pgxpool.New(ctx, databaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create connection pool: %v", err)
 	}
-
 	return &postgresDB{
 		pool: dbpool,
 	}, nil
@@ -37,19 +37,14 @@ func (db *postgresDB) LoadAllBooks(ctx context.Context) ([]Book, error) {
 	}
 	defer rows.Close()
 
-	var books []Book
-	for rows.Next() {
-		var record Book
-		err := rows.Scan(&record.ID, &record.Title)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan rows: %w", err)
-		}
-		books = append(books, record)
+	books, err := pgx.CollectRows(rows, pgx.RowToStructByName[Book])
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect rows: %w", err)
 	}
 	return books, nil
 }
 
-func (db *postgresDB) CreateBook(ctx context.Context, newBook Book) error {
+func (db *postgresDB) CreateBook(ctx context.Context, newBook NewBook) error {
 	_, err := db.pool.Exec(ctx, "INSERT INTO books (title) VALUES ($1)", newBook.Title)
 	if err != nil {
 		return fmt.Errorf("failed to insert book: %w", err)
