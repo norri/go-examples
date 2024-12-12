@@ -17,13 +17,8 @@ type NewBook struct {
 }
 
 type Database interface {
-	// LoadAllBooks retrieves all books from the database.
 	LoadAllBooks(ctx context.Context) ([]Book, error)
-
-	// CreateBook adds a new book to the database.
 	CreateBook(ctx context.Context, newBook NewBook) error
-
-	// CloseConnections closes all open connections to the database.
 	CloseConnections()
 }
 
