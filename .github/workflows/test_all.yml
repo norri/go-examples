@@ -17,23 +17,23 @@ jobs:
       - name: Find Go projects
         id: find-projects
         run: |
-          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s .)
-          echo "::set-output name=projects::$projects"
+          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s . | jq -c .)
+          echo "projects=$projects" >> $GITHUB_OUTPUT
 
   test-and-lint:
     needs: find-projects
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project:
-          - ${{ fromJson(needs.find-projects.outputs.projects) }}
+        project: ${{ fromJson(needs.find-projects.outputs.projects) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.23"
+          go-version-file: ${{ matrix.project }}/go.mod
+          cache-dependency-path: ${{ matrix.project }}/go.sum
       - name: Run lint
         uses: golangci/golangci-lint-action@v6
         with:
