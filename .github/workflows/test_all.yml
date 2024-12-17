@@ -18,7 +18,7 @@ jobs:
         id: find-projects
         run: |
           projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s .)
-          echo "::set-output name=projects::$projects"
+          echo "projects=$projects" >> $GITHUB_OUTPUT
 
   test-and-lint:
     needs: find-projects
