@@ -33,7 +33,6 @@ func (s *booksService) GetBooks(ctx context.Context) ([]domain.Book, error) {
 			Title: record.Title,
 		})
 	}
-
 	return books, nil
 }
 
@@ -41,11 +40,8 @@ func (s *booksService) SaveBook(ctx context.Context, book domain.Book) error {
 	dbBook := database.NewBook{
 		Title: book.Title,
 	}
-
-	err := s.db.CreateBook(ctx, dbBook)
-	if err != nil {
+	if err := s.db.CreateBook(ctx, dbBook); err != nil {
 		return fmt.Errorf("failed to save book: %w", err)
 	}
-
 	return nil
 }

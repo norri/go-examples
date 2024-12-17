@@ -2,10 +2,10 @@ package database
 
 import "context"
 
-// This is just an example and not for production use
+// This is just an example and not for production use.
 func newMemoryDB() Database {
 	return &memoryDB{
-		records:   make([]Book, 0, 10),
+		records:   make([]Book, 0),
 		idCounter: 0,
 	}
 }

@@ -19,7 +19,7 @@ func newPostgresDB(ctx context.Context, databaseURL string) (Database, error) {
 	// For production use set connection pool settings and validate connection with ping
 	dbpool, err := pgxpool.New(ctx, databaseURL)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create connection pool: %v", err)
+		return nil, fmt.Errorf("unable to create connection pool: %w", err)
 	}
 	return &postgresDB{
 		pool: dbpool,
