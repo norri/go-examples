@@ -1,0 +1,46 @@
+name: CI test and lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  find-projects:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.find-projects.outputs.projects }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Find Go projects
+        id: find-projects
+        run: |
+          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s .)
+          echo "::set-output name=projects::$projects"
+
+  test-and-lint:
+    needs: find-projects
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - ${{ fromJson(needs.find-projects.outputs.projects) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: Run lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+          working-directory: ${{ matrix.project }}
+      - name: Run tests
+        run: |
+          echo "Running tests in ${{ matrix.project }}"
+          cd ${{ matrix.project }}
+          go test ./...
