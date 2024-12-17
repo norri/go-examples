@@ -18,7 +18,7 @@ jobs:
       - name: Find Go projects
         id: find-projects
         run: |
-          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s .)
+          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s . | jq -c .)
           echo "projects=$projects" >> $GITHUB_OUTPUT
 
   test-and-lint:
@@ -26,8 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project:
-          - ${{ fromJson(needs.find-projects.outputs.projects) }}
+        project: ${{ fromJson(needs.find-projects.outputs.projects) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
