@@ -4,11 +4,14 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"app/datasources"
 	"app/datasources/database"
 	"app/server"
 )
+
+const readHeaderTimeout = 10 * time.Second
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -20,9 +23,10 @@ func main() {
 
 	router := server.NewServer(ctx, &datasources.DataSources{DB: db})
 	server := &http.Server{
-		Addr:    ":" + conf.Port,
-		Handler: router,
+		Addr:              ":" + conf.Port,
+		Handler:           router,
+		ReadHeaderTimeout: readHeaderTimeout,
 	}
 	log.Println("Listening on port", conf.Port)
-	log.Fatal(server.ListenAndServe())
+	log.Panic(server.ListenAndServe())
 }

@@ -25,15 +25,17 @@ func TestGetBooks(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, GetBooks(mockService))
 
-	req := httptest.NewRequest("GET", booksRoute, nil)
+	req := httptest.NewRequest(http.MethodGet, booksRoute, nil)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status %d, got %d", http.StatusOK, resp.Code)
 	}
+	result := resp.Result()
+	defer result.Body.Close()
 
-	body := bodyFromResponse[domain.BooksResponse](t, resp.Result())
+	body := bodyFromResponse[domain.BooksResponse](t, result)
 	if len(body.Books) != 1 {
 		t.Fatalf("expected 1 book, got %d", len(body.Books))
 	}
@@ -49,15 +51,17 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, GetBooks(mockService))
 
-	req := httptest.NewRequest("GET", booksRoute, nil)
+	req := httptest.NewRequest(http.MethodGet, booksRoute, nil)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusInternalServerError {
 		t.Fatalf("expected status %d, got %d", http.StatusInternalServerError, resp.Code)
 	}
+	result := resp.Result()
+	defer result.Body.Close()
 
-	body := bodyFromResponse[domain.ErrorResponse](t, resp.Result())
+	body := bodyFromResponse[domain.ErrorResponse](t, result)
 	if body.Error != "internal error" {
 		t.Fatalf("expected error message 'internal error', got '%s'", body.Error)
 	}
@@ -88,15 +92,17 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, AddBook(mockService))
 
-	req := httptest.NewRequest("POST", booksRoute, nil)
+	req := httptest.NewRequest(http.MethodPost, booksRoute, nil)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusBadRequest {
 		t.Fatalf("expected status %d, got %d", http.StatusBadRequest, resp.Code)
 	}
+	result := resp.Result()
+	defer result.Body.Close()
 
-	body := bodyFromResponse[domain.ErrorResponse](t, resp.Result())
+	body := bodyFromResponse[domain.ErrorResponse](t, result)
 	if body.Error != "invalid request" {
 		t.Fatalf("expected error message 'invalid request', got '%s'", body.Error)
 	}
@@ -119,21 +125,23 @@ func TestAddBook_ServiceFails(t *testing.T) {
 	if resp.Code != http.StatusInternalServerError {
 		t.Fatalf("expected status %d, got %d", http.StatusInternalServerError, resp.Code)
 	}
+	result := resp.Result()
+	defer result.Body.Close()
 
-	body := bodyFromResponse[domain.ErrorResponse](t, resp.Result())
-	if body.Error != "internal error" {
-		t.Fatalf("expected error message 'internal error', got '%s'", body.Error)
+	respBody := bodyFromResponse[domain.ErrorResponse](t, result)
+	if respBody.Error != "internal error" {
+		t.Fatalf("expected error message 'internal error', got '%s'", respBody.Error)
 	}
 }
 
 func postRequest(url string, body string) *http.Request {
-	req := httptest.NewRequest("POST", url, bytes.NewBufferString(body))
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 	return req
 }
 
 func bodyFromResponse[T any](t *testing.T, resp *http.Response) T {
-	defer resp.Body.Close()
+	t.Helper()
 	var body T
 	err := json.NewDecoder(resp.Body).Decode(&body)
 	if err != nil {

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"os"
 	"testing"
 )
 
 func TestNewConfiguration(t *testing.T) {
-	os.Setenv("PORT", "8080")
-	defer os.Unsetenv("PORT")
+	t.Setenv("PORT", "8080")
 
 	conf := NewConfiguration()
 
@@ -17,8 +15,6 @@ func TestNewConfiguration(t *testing.T) {
 }
 
 func TestNewConfiguration_Defaults(t *testing.T) {
-	os.Unsetenv("PORT")
-
 	conf := NewConfiguration()
 
 	if conf.Port != "3000" {
@@ -27,8 +23,7 @@ func TestNewConfiguration_Defaults(t *testing.T) {
 }
 
 func TestGetEnvOrDefault(t *testing.T) {
-	os.Setenv("TEST_ENV", "value")
-	defer os.Unsetenv("TEST_ENV")
+	t.Setenv("TEST_ENV", "value")
 
 	value := getEnvOrDefault("TEST_ENV", "default")
 	if value != "value" {

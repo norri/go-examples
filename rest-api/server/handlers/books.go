@@ -14,13 +14,13 @@ func GetBooks(service services.BooksService) func(w http.ResponseWriter, r *http
 		books, err := service.GetBooks(r.Context())
 		if err != nil {
 			slog.Error("GetBooks failed", "error", err)
-			sendResponse(w, http.StatusInternalServerError, domain.ErrorResponse{
+			sendJSON(w, http.StatusInternalServerError, domain.ErrorResponse{
 				Error: "internal error",
 			})
 			return
 		}
 
-		sendResponse(w, http.StatusOK, domain.BooksResponse{
+		sendJSON(w, http.StatusOK, domain.BooksResponse{
 			Books: books,
 		})
 	}
@@ -32,7 +32,7 @@ func AddBook(service services.BooksService) func(w http.ResponseWriter, r *http.
 		err := json.NewDecoder(r.Body).Decode(&book)
 		if err != nil {
 			slog.Warn("AddBook request parsing failed", "error", err)
-			sendResponse(w, http.StatusBadRequest, domain.ErrorResponse{
+			sendJSON(w, http.StatusBadRequest, domain.ErrorResponse{
 				Error: "invalid request",
 			})
 			return
@@ -42,7 +42,7 @@ func AddBook(service services.BooksService) func(w http.ResponseWriter, r *http.
 		err = service.SaveBook(r.Context(), book)
 		if err != nil {
 			slog.Error("AddBook failed", "error", err)
-			sendResponse(w, http.StatusInternalServerError, domain.ErrorResponse{
+			sendJSON(w, http.StatusInternalServerError, domain.ErrorResponse{
 				Error: "internal error",
 			})
 			return
@@ -51,14 +51,18 @@ func AddBook(service services.BooksService) func(w http.ResponseWriter, r *http.
 	}
 }
 
-func sendResponse(w http.ResponseWriter, code int, response any) {
+func sendJSON(w http.ResponseWriter, code int, response any) {
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
-		slog.Error("sendResponse failed", "error", err)
+		slog.Error("sendResponse json.Marshal failed", "error", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(jsonResponse)
+	_, err = w.Write(jsonResponse)
+	if err != nil {
+		slog.Error("sendResponse w.Write failed", "error", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+	}
 }

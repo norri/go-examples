@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"app/datasources"
@@ -13,7 +14,11 @@ func NewServer(ctx context.Context, dataSources *datasources.DataSources) *http.
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/status", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
+		_, err := w.Write([]byte("ok"))
+		if err != nil {
+			slog.Error("failed to write status response", "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	})
 	mux.HandleFunc("GET /api/v1/books", handlers.GetBooks(services.NewBooksService(dataSources.DB)))
 	mux.HandleFunc("POST /api/v1/books", handlers.AddBook(services.NewBooksService(dataSources.DB)))

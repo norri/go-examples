@@ -12,7 +12,7 @@ import (
 func TestGetStatus(t *testing.T) {
 	app := NewServer(context.Background(), &datasources.DataSources{})
 
-	req := httptest.NewRequest("GET", "/api/status", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/status", nil)
 	resp := httptest.NewRecorder()
 	app.ServeHTTP(resp, req)
 

@@ -60,6 +60,7 @@ func TestMemoryDB_SaveBookMultiple(t *testing.T) {
 }
 
 func assertBook(t *testing.T, book Book, expectedID int, expected NewBook) {
+	t.Helper()
 	if book.ID != expectedID {
 		t.Fatalf("expected ID %d, got %d", expectedID, book.ID)
 	}
