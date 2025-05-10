@@ -36,7 +36,7 @@ linters:
     # - gci
     - ginkgolinter
     - gocheckcompilerdirectives
-    # - gochecknoglobals
+    - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
     - gocognit
@@ -57,13 +57,13 @@ linters:
     - gosmopolitan
     - govet
     - grouper
-    # - iface
+    - iface
     - importas
     - inamedparam
     - ineffassign
     - interfacebloat
     - intrange
-    # - ireturn
+    - ireturn
     - lll
     - loggercheck
     - maintidx
@@ -88,8 +88,8 @@ linters:
     - promlinter
     - protogetter
     - reassign
-    # - recvcheck
-    # - revive
+    - recvcheck
+    - revive
     - rowserrcheck
     - sloglint
     - spancheck
