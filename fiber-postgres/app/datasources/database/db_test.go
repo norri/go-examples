@@ -13,14 +13,16 @@ func TestNewDatabase_MemoryDB(t *testing.T) {
 	ctx := context.Background()
 	db, err := NewDatabase(ctx, "")
 	require.NoError(t, err)
-	assert.Equal(t, "*database.memoryDB", reflect.TypeOf(db).String())
+	assert.Equal(t, "*database.DB", reflect.TypeOf(db).String())
+	assert.Equal(t, "*database.memoryDB", reflect.TypeOf(db.impl).String())
 }
 
 func TestNewDatabase_PostgresDB(t *testing.T) {
 	ctx := context.Background()
 	db, err := NewDatabase(ctx, "postgres://localhost:5432")
 	require.NoError(t, err)
-	assert.Equal(t, "*database.postgresDB", reflect.TypeOf(db).String())
+	assert.Equal(t, "*database.DB", reflect.TypeOf(db).String())
+	assert.Equal(t, "*database.postgresDB", reflect.TypeOf(db.impl).String())
 }
 
 func TestNewDatabase_InvalidDatabaseConfiguration(t *testing.T) {

@@ -100,10 +100,11 @@ func postRequest(url string, body string) *http.Request {
 	return req
 }
 
+//nolint:ireturn
 func bodyFromResponse[T any](t *testing.T, resp *http.Response) T {
 	t.Helper()
 	var body T
 	err := json.NewDecoder(resp.Body).Decode(&body)
-	require.NoError(t, err)
+	require.NoError(t, err, "failed to decode response body")
 	return body
 }
