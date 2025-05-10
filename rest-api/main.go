@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"time"
@@ -14,14 +13,11 @@ import (
 const readHeaderTimeout = 10 * time.Second
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	conf := NewConfiguration()
 	db := database.NewDatabase()
 	defer db.CloseConnections()
 
-	router := server.NewServer(ctx, &datasources.DataSources{DB: db})
+	router := server.NewServer(&datasources.DataSources{DB: db})
 	server := &http.Server{
 		Addr:              ":" + conf.Port,
 		Handler:           router,

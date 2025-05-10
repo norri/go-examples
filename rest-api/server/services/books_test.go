@@ -10,8 +10,8 @@ import (
 )
 
 func TestGetBooks(t *testing.T) {
-	mockDB := &database.DatabaseMock{
-		LoadAllBooksFunc: func(ctx context.Context) ([]database.Book, error) {
+	mockDB := &database.MockDatabase{
+		LoadAllBooksFunc: func(_ context.Context) ([]database.Book, error) {
 			return []database.Book{{Title: "Title"}}, nil
 		},
 	}
@@ -27,8 +27,8 @@ func TestGetBooks(t *testing.T) {
 }
 
 func TestGetBooks_Fails(t *testing.T) {
-	mockDB := &database.DatabaseMock{
-		LoadAllBooksFunc: func(ctx context.Context) ([]database.Book, error) {
+	mockDB := &database.MockDatabase{
+		LoadAllBooksFunc: func(_ context.Context) ([]database.Book, error) {
 			return nil, errors.New("error")
 		},
 	}
@@ -41,8 +41,8 @@ func TestGetBooks_Fails(t *testing.T) {
 }
 
 func TestSaveBook(t *testing.T) {
-	mockDB := &database.DatabaseMock{
-		CreateBookFunc: func(ctx context.Context, newBook database.NewBook) error {
+	mockDB := &database.MockDatabase{
+		CreateBookFunc: func(_ context.Context, _ database.NewBook) error {
 			return nil
 		},
 	}
@@ -55,8 +55,8 @@ func TestSaveBook(t *testing.T) {
 }
 
 func TestSaveBook_Fails(t *testing.T) {
-	mockDB := &database.DatabaseMock{
-		CreateBookFunc: func(ctx context.Context, newBook database.NewBook) error {
+	mockDB := &database.MockDatabase{
+		CreateBookFunc: func(_ context.Context, _ database.NewBook) error {
 			return errors.New("error")
 		},
 	}

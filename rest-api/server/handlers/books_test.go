@@ -13,11 +13,11 @@ import (
 	"app/server/services"
 )
 
-var booksRoute = "/api/v1/books"
+const booksRoute = "/api/v1/books"
 
 func TestGetBooks(t *testing.T) {
-	mockService := &services.BooksServiceMock{
-		GetBooksFunc: func(ctx context.Context) ([]domain.Book, error) {
+	mockService := &services.MockBooksService{
+		GetBooksFunc: func(_ context.Context) ([]domain.Book, error) {
 			return []domain.Book{{Title: "Title"}}, nil
 		},
 	}
@@ -42,8 +42,8 @@ func TestGetBooks(t *testing.T) {
 }
 
 func TestGetBooks_ServiceFails(t *testing.T) {
-	mockService := &services.BooksServiceMock{
-		GetBooksFunc: func(ctx context.Context) ([]domain.Book, error) {
+	mockService := &services.MockBooksService{
+		GetBooksFunc: func(_ context.Context) ([]domain.Book, error) {
 			return nil, errors.New("error")
 		},
 	}
@@ -68,8 +68,8 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 }
 
 func TestAddBook(t *testing.T) {
-	mockService := &services.BooksServiceMock{
-		SaveBookFunc: func(ctx context.Context, newBook domain.Book) error {
+	mockService := &services.MockBooksService{
+		SaveBookFunc: func(_ context.Context, _ domain.Book) error {
 			return nil
 		},
 	}
@@ -87,7 +87,7 @@ func TestAddBook(t *testing.T) {
 }
 
 func TestAddBook_InvalidRequest(t *testing.T) {
-	mockService := &services.BooksServiceMock{}
+	mockService := &services.MockBooksService{}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, AddBook(mockService))
@@ -109,8 +109,8 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 }
 
 func TestAddBook_ServiceFails(t *testing.T) {
-	mockService := &services.BooksServiceMock{
-		SaveBookFunc: func(ctx context.Context, newBook domain.Book) error {
+	mockService := &services.MockBooksService{
+		SaveBookFunc: func(_ context.Context, _ domain.Book) error {
 			return errors.New("error")
 		},
 	}
@@ -140,6 +140,7 @@ func postRequest(url string, body string) *http.Request {
 	return req
 }
 
+//nolint:ireturn
 func bodyFromResponse[T any](t *testing.T, resp *http.Response) T {
 	t.Helper()
 	var body T

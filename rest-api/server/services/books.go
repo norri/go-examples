@@ -13,15 +13,15 @@ type BooksService interface {
 	SaveBook(ctx context.Context, newBook domain.Book) error
 }
 
-type booksService struct {
+type DefaultBooksService struct {
 	db database.Database
 }
 
-func NewBooksService(db database.Database) BooksService {
-	return &booksService{db: db}
+func NewBooksService(db database.Database) *DefaultBooksService {
+	return &DefaultBooksService{db: db}
 }
 
-func (s *booksService) GetBooks(ctx context.Context) ([]domain.Book, error) {
+func (s *DefaultBooksService) GetBooks(ctx context.Context) ([]domain.Book, error) {
 	dbRecords, err := s.db.LoadAllBooks(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load books: %w", err)
@@ -36,7 +36,7 @@ func (s *booksService) GetBooks(ctx context.Context) ([]domain.Book, error) {
 	return books, nil
 }
 
-func (s *booksService) SaveBook(ctx context.Context, book domain.Book) error {
+func (s *DefaultBooksService) SaveBook(ctx context.Context, book domain.Book) error {
 	dbBook := database.NewBook{
 		Title: book.Title,
 	}

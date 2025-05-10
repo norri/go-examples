@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestGetStatus(t *testing.T) {
-	app := NewServer(context.Background(), &datasources.DataSources{})
+	app := NewServer(&datasources.DataSources{})
 
 	req := httptest.NewRequest(http.MethodGet, "/api/status", nil)
 	resp := httptest.NewRecorder()

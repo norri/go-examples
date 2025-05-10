@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"log/slog"
 	"net/http"
 
@@ -10,10 +9,10 @@ import (
 	"app/server/services"
 )
 
-func NewServer(ctx context.Context, dataSources *datasources.DataSources) *http.ServeMux {
+func NewServer(dataSources *datasources.DataSources) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /api/status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /api/status", func(w http.ResponseWriter, _ *http.Request) {
 		_, err := w.Write([]byte("ok"))
 		if err != nil {
 			slog.Error("failed to write status response", "error", err)
