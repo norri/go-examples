@@ -57,7 +57,6 @@ linters:
     - gosmopolitan
     - govet
     - grouper
-    - iface
     - importas
     - inamedparam
     - ineffassign
@@ -88,7 +87,6 @@ linters:
     - promlinter
     - protogetter
     - reassign
-    - recvcheck
     - revive
     - rowserrcheck
     - sloglint
