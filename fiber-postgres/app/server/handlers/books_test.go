@@ -16,10 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var booksRoute = "/api/v1/books"
+const booksRoute = "/api/v1/books"
 
 func TestGetBooks(t *testing.T) {
-	mockService := new(services.BooksServiceMock)
+	mockService := new(services.MockBooksService)
 	mockService.On("GetBooks", mock.Anything).Return([]domain.Book{{Title: "Title"}}, nil)
 
 	app := fiber.New()
@@ -35,7 +35,7 @@ func TestGetBooks(t *testing.T) {
 }
 
 func TestGetBooks_ServiceFails(t *testing.T) {
-	mockService := new(services.BooksServiceMock)
+	mockService := new(services.MockBooksService)
 	mockService.On("GetBooks", mock.Anything).Return(nil, assert.AnError)
 
 	app := fiber.New()
@@ -51,7 +51,7 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 }
 
 func TestAddBook(t *testing.T) {
-	mockService := new(services.BooksServiceMock)
+	mockService := new(services.MockBooksService)
 	mockService.On("SaveBook", mock.Anything, domain.Book{Title: "Title"}).Return(nil)
 
 	app := fiber.New()
@@ -64,7 +64,7 @@ func TestAddBook(t *testing.T) {
 }
 
 func TestAddBook_InvalidRequest(t *testing.T) {
-	mockService := new(services.BooksServiceMock)
+	mockService := new(services.MockBooksService)
 
 	app := fiber.New()
 	app.Post(booksRoute, AddBook(mockService))
@@ -79,7 +79,7 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 }
 
 func TestAddBook_ServiceFails(t *testing.T) {
-	mockService := new(services.BooksServiceMock)
+	mockService := new(services.MockBooksService)
 	mockService.On("SaveBook", mock.Anything, domain.Book{Title: "Title"}).Return(assert.AnError)
 
 	app := fiber.New()
