@@ -17,7 +17,7 @@ type booksService struct {
 	db database.Database
 }
 
-func NewBooksService(db database.Database) BooksService {
+func NewBooksService(db database.Database) *booksService {
 	return &booksService{db: db}
 }
 

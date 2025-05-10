@@ -11,14 +11,14 @@ func TestNewConfiguration(t *testing.T) {
 	t.Setenv("PORT", "8080")
 	t.Setenv("DATABASE_URL", "postgres://user:pass@localhost:5432/dbname")
 
-	conf := NewConfiguration()
+	conf := newConfiguration()
 
 	assert.Equal(t, "8080", conf.Port)
 	assert.Equal(t, "postgres://user:pass@localhost:5432/dbname", conf.DatabaseURL)
 }
 
 func TestNewConfiguration_Defaults(t *testing.T) {
-	conf := NewConfiguration()
+	conf := newConfiguration()
 
 	assert.Equal(t, "3000", conf.Port)
 	assert.Equal(t, "", conf.DatabaseURL)

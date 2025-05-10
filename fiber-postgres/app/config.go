@@ -5,17 +5,17 @@ import (
 	"os"
 )
 
-type Configuration struct {
+type configuration struct {
 	Port        string
 	DatabaseURL string
 }
 
-func NewConfiguration() *Configuration {
+func newConfiguration() *configuration {
 	dbURL := getEnvOrDefault("DATABASE_URL", "")
 	if dbURL == "" {
 		slog.Warn("DATABASE_URL is not set")
 	}
-	return &Configuration{
+	return &configuration{
 		Port:        getEnvOrDefault("PORT", "3000"),
 		DatabaseURL: dbURL,
 	}
