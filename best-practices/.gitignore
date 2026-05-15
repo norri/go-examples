@@ -4,3 +4,4 @@ junit.xml
 bench.txt
 sbom.cdx.json
 gosec.sarif
+grype.sarif

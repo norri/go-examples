@@ -57,8 +57,11 @@ mod-verify: ## Verify dependencies match checksum database
 mod-outdated: ## List outdated direct dependencies
 	go list -u -m -json all | go-mod-outdated -direct -update
 
+SBOM_NAME    ?= $(notdir $(CURDIR))
+SBOM_VERSION ?= 0.1.0
+
 sbom-vuln: ## Generate CycloneDX SBOM with syft and scan with grype
-	syft . -o cyclonedx-json=sbom.cdx.json
+	syft . --source-name $(SBOM_NAME) --source-version $(SBOM_VERSION) -o cyclonedx-json=sbom.cdx.json
 	grype sbom.cdx.json -o sarif=grype.sarif
 
 # ---------- hooks ----------

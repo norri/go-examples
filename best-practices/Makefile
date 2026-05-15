@@ -28,8 +28,11 @@ demo-bad: ## Run tools against bad/ (expected to flag issues)
 	-gosec -quiet ./bad/...
 	-nilaway ./bad/...
 
+SBOM_NAME    ?= best-practices
+SBOM_VERSION ?= 0.1.0
+
 sbom-vuln: ## Generate CycloneDX SBOM with syft and scan with grype
-	syft . -o cyclonedx-json=sbom.cdx.json
+	syft . --source-name $(SBOM_NAME) --source-version $(SBOM_VERSION) -o cyclonedx-json=sbom.cdx.json
 	grype sbom.cdx.json
 
 install-tools: ## Install all CLI tools (delegates to template/Makefile)
