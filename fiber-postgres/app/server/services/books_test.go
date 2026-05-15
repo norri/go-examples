@@ -12,9 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const bookTitle = "Title"
+
 func TestGetBooks(t *testing.T) {
 	mockDB := new(database.MockDatabase)
-	mockDB.On("LoadAllBooks", mock.Anything).Return([]database.Book{{Title: "Title"}}, nil)
+	mockDB.On("LoadAllBooks", mock.Anything).Return([]database.Book{{Title: bookTitle}}, nil)
 
 	service := NewBooksService(mockDB)
 	books, err := service.GetBooks(context.Background())
@@ -33,18 +35,18 @@ func TestGetBooks_Fails(t *testing.T) {
 
 func TestSaveBook(t *testing.T) {
 	mockDB := new(database.MockDatabase)
-	mockDB.On("CreateBook", mock.Anything, database.NewBook{Title: "Title"}).Return(nil)
+	mockDB.On("CreateBook", mock.Anything, database.NewBook{Title: bookTitle}).Return(nil)
 
 	service := NewBooksService(mockDB)
-	err := service.SaveBook(context.Background(), domain.Book{Title: "Title"})
+	err := service.SaveBook(context.Background(), domain.Book{Title: bookTitle})
 	require.NoError(t, err)
 }
 
 func TestSaveBook_Fails(t *testing.T) {
 	mockDB := new(database.MockDatabase)
-	mockDB.On("CreateBook", mock.Anything, database.NewBook{Title: "Title"}).Return(assert.AnError)
+	mockDB.On("CreateBook", mock.Anything, database.NewBook{Title: bookTitle}).Return(assert.AnError)
 
 	service := NewBooksService(mockDB)
-	err := service.SaveBook(context.Background(), domain.Book{Title: "Title"})
+	err := service.SaveBook(context.Background(), domain.Book{Title: bookTitle})
 	assert.Error(t, err)
 }

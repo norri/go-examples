@@ -9,13 +9,15 @@ import (
 	"app/server/services"
 )
 
+const errInternal = "internal error"
+
 func GetBooks(service services.BooksService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		books, err := service.GetBooks(r.Context())
 		if err != nil {
 			slog.Error("GetBooks failed", "error", err)
 			sendJSON(w, http.StatusInternalServerError, domain.ErrorResponse{
-				Error: "internal error",
+				Error: errInternal,
 			})
 			return
 		}
@@ -43,7 +45,7 @@ func AddBook(service services.BooksService) func(w http.ResponseWriter, r *http.
 		if err != nil {
 			slog.Error("AddBook failed", "error", err)
 			sendJSON(w, http.StatusInternalServerError, domain.ErrorResponse{
-				Error: "internal error",
+				Error: errInternal,
 			})
 			return
 		}
@@ -55,7 +57,7 @@ func sendJSON(w http.ResponseWriter, code int, response any) {
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
 		slog.Error("sendResponse json.Marshal failed", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		http.Error(w, errInternal, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -63,6 +65,6 @@ func sendJSON(w http.ResponseWriter, code int, response any) {
 	_, err = w.Write(jsonResponse)
 	if err != nil {
 		slog.Error("sendResponse w.Write failed", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		http.Error(w, errInternal, http.StatusInternalServerError)
 	}
 }

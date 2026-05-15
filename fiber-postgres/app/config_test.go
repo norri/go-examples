@@ -21,7 +21,7 @@ func TestNewConfiguration_Defaults(t *testing.T) {
 	conf := newConfiguration()
 
 	assert.Equal(t, "3000", conf.Port)
-	assert.Equal(t, "", conf.DatabaseURL)
+	assert.Empty(t, conf.DatabaseURL)
 }
 
 func TestGetEnvOrDefault(t *testing.T) {

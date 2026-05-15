@@ -25,7 +25,7 @@ func TestGetBooks(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, GetBooks(mockService))
 
-	req := httptest.NewRequest(http.MethodGet, booksRoute, nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, booksRoute, nil)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
@@ -51,7 +51,7 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, GetBooks(mockService))
 
-	req := httptest.NewRequest(http.MethodGet, booksRoute, nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, booksRoute, nil)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
@@ -62,8 +62,8 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 	defer result.Body.Close()
 
 	body := bodyFromResponse[domain.ErrorResponse](t, result)
-	if body.Error != "internal error" {
-		t.Fatalf("expected error message 'internal error', got '%s'", body.Error)
+	if body.Error != errInternal {
+		t.Fatalf("expected error message %q, got %q", errInternal, body.Error)
 	}
 }
 
@@ -77,7 +77,7 @@ func TestAddBook(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, AddBook(mockService))
 
-	req := postRequest(booksRoute, `{"title":"Title"}`)
+	req := postRequest(t.Context(), booksRoute, `{"title":"Title"}`)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
@@ -92,7 +92,7 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, AddBook(mockService))
 
-	req := httptest.NewRequest(http.MethodPost, booksRoute, nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, booksRoute, nil)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
@@ -118,7 +118,7 @@ func TestAddBook_ServiceFails(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(booksRoute, AddBook(mockService))
 
-	req := postRequest(booksRoute, `{"title":"Title"}`)
+	req := postRequest(t.Context(), booksRoute, `{"title":"Title"}`)
 	resp := httptest.NewRecorder()
 	mux.ServeHTTP(resp, req)
 
@@ -129,13 +129,13 @@ func TestAddBook_ServiceFails(t *testing.T) {
 	defer result.Body.Close()
 
 	respBody := bodyFromResponse[domain.ErrorResponse](t, result)
-	if respBody.Error != "internal error" {
-		t.Fatalf("expected error message 'internal error', got '%s'", respBody.Error)
+	if respBody.Error != errInternal {
+		t.Fatalf("expected error message %q, got %q", errInternal, respBody.Error)
 	}
 }
 
-func postRequest(url string, body string) *http.Request {
-	req := httptest.NewRequest(http.MethodPost, url, bytes.NewBufferString(body))
+func postRequest(ctx context.Context, url string, body string) *http.Request {
+	req := httptest.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 	return req
 }

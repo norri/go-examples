@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -16,16 +17,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const booksRoute = "/api/v1/books"
+const (
+	booksRoute = "/api/v1/books"
+	bookTitle  = "Title"
+)
 
 func TestGetBooks(t *testing.T) {
 	mockService := new(services.MockBooksService)
-	mockService.On("GetBooks", mock.Anything).Return([]domain.Book{{Title: "Title"}}, nil)
+	mockService.On("GetBooks", mock.Anything).Return([]domain.Book{{Title: bookTitle}}, nil)
 
 	app := fiber.New()
 	app.Get(booksRoute, GetBooks(mockService))
 
-	resp, err := app.Test(httptest.NewRequest(http.MethodGet, booksRoute, nil))
+	resp, err := app.Test(httptest.NewRequestWithContext(t.Context(), http.MethodGet, booksRoute, nil))
 	require.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
 	defer resp.Body.Close()
@@ -41,23 +45,23 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 	app := fiber.New()
 	app.Get(booksRoute, GetBooks(mockService))
 
-	resp, err := app.Test(httptest.NewRequest(http.MethodGet, booksRoute, nil))
+	resp, err := app.Test(httptest.NewRequestWithContext(t.Context(), http.MethodGet, booksRoute, nil))
 	require.NoError(t, err)
 	assert.Equal(t, 500, resp.StatusCode)
 	defer resp.Body.Close()
 
 	body := bodyFromResponse[domain.ErrorResponse](t, resp)
-	assert.Equal(t, "internal error", body.Error)
+	assert.Equal(t, errInternal, body.Error)
 }
 
 func TestAddBook(t *testing.T) {
 	mockService := new(services.MockBooksService)
-	mockService.On("SaveBook", mock.Anything, domain.Book{Title: "Title"}).Return(nil)
+	mockService.On("SaveBook", mock.Anything, domain.Book{Title: bookTitle}).Return(nil)
 
 	app := fiber.New()
 	app.Post(booksRoute, AddBook(mockService))
 
-	resp, err := app.Test(postRequest(booksRoute, `{"title":"Title"}`))
+	resp, err := app.Test(postRequest(t.Context(), booksRoute, `{"title":"Title"}`))
 	require.NoError(t, err)
 	assert.Equal(t, 201, resp.StatusCode)
 	defer resp.Body.Close()
@@ -69,7 +73,7 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 	app := fiber.New()
 	app.Post(booksRoute, AddBook(mockService))
 
-	resp, err := app.Test(httptest.NewRequest(http.MethodPost, booksRoute, nil))
+	resp, err := app.Test(httptest.NewRequestWithContext(t.Context(), http.MethodPost, booksRoute, nil))
 	require.NoError(t, err)
 	assert.Equal(t, 400, resp.StatusCode)
 	defer resp.Body.Close()
@@ -80,22 +84,22 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 
 func TestAddBook_ServiceFails(t *testing.T) {
 	mockService := new(services.MockBooksService)
-	mockService.On("SaveBook", mock.Anything, domain.Book{Title: "Title"}).Return(assert.AnError)
+	mockService.On("SaveBook", mock.Anything, domain.Book{Title: bookTitle}).Return(assert.AnError)
 
 	app := fiber.New()
 	app.Post(booksRoute, AddBook(mockService))
 
-	resp, err := app.Test(postRequest(booksRoute, `{"title":"Title"}`))
+	resp, err := app.Test(postRequest(t.Context(), booksRoute, `{"title":"Title"}`))
 	require.NoError(t, err)
 	assert.Equal(t, 500, resp.StatusCode)
 	defer resp.Body.Close()
 
 	body := bodyFromResponse[domain.ErrorResponse](t, resp)
-	assert.Equal(t, "internal error", body.Error)
+	assert.Equal(t, errInternal, body.Error)
 }
 
-func postRequest(url string, body string) *http.Request {
-	req := httptest.NewRequest(http.MethodPost, url, bytes.NewBufferString(body))
+func postRequest(ctx context.Context, url string, body string) *http.Request {
+	req := httptest.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBufferString(body))
 	req.Header.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
 	return req
 }
