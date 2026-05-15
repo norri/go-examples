@@ -15,7 +15,7 @@ import (
 func TestGetStatus(t *testing.T) {
 	app := NewServer(&datasources.DataSources{})
 
-	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/api/status", nil))
+	resp, err := app.Test(httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/status", nil))
 	require.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
 	defer resp.Body.Close()
