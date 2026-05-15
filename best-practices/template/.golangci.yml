@@ -1,0 +1,80 @@
+# golangci-lint v2 config — https://golangci-lint.run/
+# Curated, opinionated baseline. Tune `enable`/`disable` to your project.
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: none
+  enable:
+    # Correctness / bug-prevention
+    - govet            # vet — shadowing, printf, lock copying, etc.
+    - staticcheck      # the gold-standard static analyzer (SA, ST, QF, S checks)
+    - errcheck         # forgotten error returns
+    - errorlint        # incorrect %w / errors.Is/As usage
+    - bodyclose        # http.Response.Body not closed
+    - rowserrcheck     # sql.Rows.Err not checked
+    - sqlclosecheck    # sql.Rows/Stmt not closed
+    - nilerr           # `return nil` after err != nil
+    - contextcheck     # passes wrong context
+    - copyloopvar      # Go 1.22+ loopvar correctness
+    - exhaustive       # missing enum cases in switches
+    - makezero         # slice made with non-zero len then appended
+    - noctx            # http.NewRequest without context
+    - fatcontext       # context nested in loops (memory leak)
+
+    # Security
+    - gosec            # security smells (SQLi, weak crypto, hardcoded creds)
+
+    # Code quality / readability
+    - revive           # configurable replacement for golint
+    - gocritic         # opinionated diagnostics
+    - gocyclo          # cyclomatic complexity
+    - gocognit         # cognitive complexity
+    - dupl             # duplicate code blocks
+    - misspell         # English misspellings in comments / strings
+    - unconvert        # redundant type conversions
+    - unparam          # unused function parameters
+    - unused           # unused identifiers (replaces deadcode/varcheck/structcheck)
+    - prealloc         # slice could be preallocated
+    - predeclared      # shadowing predeclared identifiers (len, new...)
+
+    # Testing
+    - thelper          # t.Helper() missing
+    - tparallel        # incorrect t.Parallel usage
+    - testifylint      # testify usage smells
+
+  settings:
+    gocyclo:
+      min-complexity: 15
+    gocognit:
+      min-complexity: 20
+    revive:
+      rules:
+        - name: exported
+        - name: var-naming
+        - name: error-return
+        - name: error-naming
+        - name: if-return
+        - name: increment-decrement
+        - name: range
+        - name: receiver-naming
+        - name: unreachable-code
+        - name: redefines-builtin-id
+
+  exclusions:
+    # Less strict in tests where verbosity and duplication are common.
+    rules:
+      - path: _test\.go
+        linters:
+          - dupl
+          - gocyclo
+          - gocognit
+          - gosec
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

@@ -1,0 +1,23 @@
+# Dependabot configuration — https://docs.github.com/en/code-security/dependabot
+#
+# When copying this file to a new repo, update the `directory:` values to
+# match your project layout (e.g. "/" for a single-module repo at the root).
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: "/best-practices"   # change to "/" for a single-module repo
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      go-deps:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns: ["*"]
