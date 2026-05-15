@@ -94,8 +94,9 @@ jobs:
         with:
           version: latest
           working-directory: best-practices
+          # -c overrides parent-dir lookup (root .golangci.yml is v1 format).
           # bad/ holds intentionally broken code (see README). Scope to good/.
-          args: ./good/...
+          args: -c template/.golangci.yml ./good/...
 
   # ---------------------------------------------------------------------------
   # 3. Tests with race detector, shuffled order, JUnit + coverage artifacts.
