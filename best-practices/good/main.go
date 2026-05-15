@@ -181,7 +181,7 @@ func main() {
 	if err := runQueryDemo(ctx); err != nil {
 		fmt.Fprintln(os.Stderr, "query:", err)
 	}
-	_ = hashSecret("hunter2")
+	fmt.Printf("secret hash: %x\n", hashSecret("hunter2"))
 	if _, err := pickToken(); err != nil {
 		fmt.Fprintln(os.Stderr, "token:", err)
 	}
