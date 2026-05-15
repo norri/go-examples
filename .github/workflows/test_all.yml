@@ -17,9 +17,7 @@ jobs:
       - name: Find Go projects
         id: find-projects
         run: |
-          # best-practices/ has its own dedicated CI (best-practices-ci.yml) and
-          # targets Go 1.26 which requires golangci-lint v2 — excluded here.
-          projects=$(find . -type f -name 'go.mod' -not -path './best-practices/*' -exec dirname {} \; | jq -R . | jq -s . | jq -c .)
+          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s . | jq -c .)
           echo "projects=$projects" >> $GITHUB_OUTPUT
 
   test-and-lint:
@@ -37,9 +35,9 @@ jobs:
           go-version-file: ${{ matrix.project }}/go.mod
           cache-dependency-path: ${{ matrix.project }}/go.sum
       - name: Run lint
-        uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
         with:
-          version: v1.64.8
+          version: latest
           working-directory: ${{ matrix.project }}
       - name: Run tests
         run: |
