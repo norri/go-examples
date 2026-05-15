@@ -9,12 +9,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+const errInternal = "internal error"
+
 func GetBooks(service services.BooksService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		books, err := service.GetBooks(c.UserContext())
 		if err != nil {
 			slog.Error("GetBooks failed", "error", err)
-			return sendError(c, fiber.StatusInternalServerError, "internal error")
+			return sendError(c, fiber.StatusInternalServerError, errInternal)
 		}
 
 		return c.JSON(domain.BooksResponse{
@@ -35,7 +37,7 @@ func AddBook(service services.BooksService) fiber.Handler {
 		err := service.SaveBook(c.UserContext(), book)
 		if err != nil {
 			slog.Error("AddBook failed", "error", err)
-			return sendError(c, fiber.StatusInternalServerError, "internal error")
+			return sendError(c, fiber.StatusInternalServerError, errInternal)
 		}
 		return c.SendStatus(fiber.StatusCreated)
 	}

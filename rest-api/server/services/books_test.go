@@ -9,10 +9,12 @@ import (
 	"app/server/domain"
 )
 
+const bookTitle = "Title"
+
 func TestGetBooks(t *testing.T) {
 	mockDB := &database.MockDatabase{
 		LoadAllBooksFunc: func(_ context.Context) ([]database.Book, error) {
-			return []database.Book{{Title: "Title"}}, nil
+			return []database.Book{{Title: bookTitle}}, nil
 		},
 	}
 
@@ -48,7 +50,7 @@ func TestSaveBook(t *testing.T) {
 	}
 
 	service := NewBooksService(mockDB)
-	err := service.SaveBook(context.Background(), domain.Book{Title: "Title"})
+	err := service.SaveBook(context.Background(), domain.Book{Title: bookTitle})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -62,7 +64,7 @@ func TestSaveBook_Fails(t *testing.T) {
 	}
 
 	service := NewBooksService(mockDB)
-	err := service.SaveBook(context.Background(), domain.Book{Title: "Title"})
+	err := service.SaveBook(context.Background(), domain.Book{Title: bookTitle})
 	if err == nil {
 		t.Fatalf("expected error, got nil")
 	}

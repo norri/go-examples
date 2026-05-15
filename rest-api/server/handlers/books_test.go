@@ -62,8 +62,8 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 	defer result.Body.Close()
 
 	body := bodyFromResponse[domain.ErrorResponse](t, result)
-	if body.Error != "internal error" {
-		t.Fatalf("expected error message 'internal error', got '%s'", body.Error)
+	if body.Error != errInternal {
+		t.Fatalf("expected error message %q, got %q", errInternal, body.Error)
 	}
 }
 
@@ -129,8 +129,8 @@ func TestAddBook_ServiceFails(t *testing.T) {
 	defer result.Body.Close()
 
 	respBody := bodyFromResponse[domain.ErrorResponse](t, result)
-	if respBody.Error != "internal error" {
-		t.Fatalf("expected error message 'internal error', got '%s'", respBody.Error)
+	if respBody.Error != errInternal {
+		t.Fatalf("expected error message %q, got %q", errInternal, respBody.Error)
 	}
 }
 

@@ -17,11 +17,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const booksRoute = "/api/v1/books"
+const (
+	booksRoute = "/api/v1/books"
+	bookTitle  = "Title"
+)
 
 func TestGetBooks(t *testing.T) {
 	mockService := new(services.MockBooksService)
-	mockService.On("GetBooks", mock.Anything).Return([]domain.Book{{Title: "Title"}}, nil)
+	mockService.On("GetBooks", mock.Anything).Return([]domain.Book{{Title: bookTitle}}, nil)
 
 	app := fiber.New()
 	app.Get(booksRoute, GetBooks(mockService))
@@ -48,12 +51,12 @@ func TestGetBooks_ServiceFails(t *testing.T) {
 	defer resp.Body.Close()
 
 	body := bodyFromResponse[domain.ErrorResponse](t, resp)
-	assert.Equal(t, "internal error", body.Error)
+	assert.Equal(t, errInternal, body.Error)
 }
 
 func TestAddBook(t *testing.T) {
 	mockService := new(services.MockBooksService)
-	mockService.On("SaveBook", mock.Anything, domain.Book{Title: "Title"}).Return(nil)
+	mockService.On("SaveBook", mock.Anything, domain.Book{Title: bookTitle}).Return(nil)
 
 	app := fiber.New()
 	app.Post(booksRoute, AddBook(mockService))
@@ -81,7 +84,7 @@ func TestAddBook_InvalidRequest(t *testing.T) {
 
 func TestAddBook_ServiceFails(t *testing.T) {
 	mockService := new(services.MockBooksService)
-	mockService.On("SaveBook", mock.Anything, domain.Book{Title: "Title"}).Return(assert.AnError)
+	mockService.On("SaveBook", mock.Anything, domain.Book{Title: bookTitle}).Return(assert.AnError)
 
 	app := fiber.New()
 	app.Post(booksRoute, AddBook(mockService))
@@ -92,7 +95,7 @@ func TestAddBook_ServiceFails(t *testing.T) {
 	defer resp.Body.Close()
 
 	body := bodyFromResponse[domain.ErrorResponse](t, resp)
-	assert.Equal(t, "internal error", body.Error)
+	assert.Equal(t, errInternal, body.Error)
 }
 
 func postRequest(ctx context.Context, url string, body string) *http.Request {
