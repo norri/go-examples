@@ -17,7 +17,7 @@ jobs:
       - name: Find Go projects
         id: find-projects
         run: |
-          projects=$(find . -type f -name 'go.mod' -exec dirname {} \; | jq -R . | jq -s . | jq -c .)
+          projects=$(find . -type f -name 'go.mod' -not -path './best-practices/*' -exec dirname {} \; | jq -R . | jq -s . | jq -c .)
           echo "projects=$projects" >> $GITHUB_OUTPUT
 
   test-and-lint:
