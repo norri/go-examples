@@ -5,38 +5,46 @@
 #
 # This Makefile only orchestrates the demo against good/ and bad/.
 
-CONFIG := -c $(CURDIR)/template/.golangci.yml
+CONFIG       := -c $(CURDIR)/template/.golangci.yml
+SBOM_NAME    ?= best-practices
+SBOM_VERSION ?= 0.1.0
 
-.PHONY: help demo-good demo-bad demo-lint demo-vet demo-sec demo-nilaway install-tools clean
+.PHONY: help \
+        demo-good demo-bad \
+        sbom-vuln \
+        install-tools clean
 
+# ---------- entry points ----------
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 	@echo
 	@echo "To copy into a new project: cp -r template/. /path/to/your/project/"
 
-demo-good: ## Run lint + tests + vet against good/ (should be clean)
+# ---------- demos ----------
+demo-good: ## Run the full pipeline against good/ (should be clean)
 	go vet ./good/...
 	golangci-lint run $(CONFIG) ./good/...
 	go test -race ./good/...
+	govulncheck ./good/...
 	gosec -quiet ./good/...
 	nilaway ./good/...
 
-demo-bad: ## Run tools against bad/ (expected to flag issues)
+demo-bad: ## Run the full pipeline against bad/ (expected to flag issues)
 	-go vet ./bad/...
 	-golangci-lint run $(CONFIG) ./bad/...
 	-go test -race ./bad/...
+	-govulncheck ./bad/...
 	-gosec -quiet ./bad/...
 	-nilaway ./bad/...
 
-SBOM_NAME    ?= best-practices
-SBOM_VERSION ?= 0.1.0
-
-sbom-vuln: ## Generate CycloneDX SBOM with syft and scan with grype
+# ---------- security ----------
+sbom-vuln: ## Supply chain scan with syft + grype for go.mod + go.sum (both good/ and bad/ use the same dependencies)
 	syft . --source-name $(SBOM_NAME) --source-version $(SBOM_VERSION) -o cyclonedx-json=sbom.cdx.json
 	grype sbom.cdx.json
 
+# ---------- utilities ----------
 install-tools: ## Install all CLI tools (delegates to template/Makefile)
 	$(MAKE) -C template install-tools
 
-clean:
-	rm -f sbom.cdx.json good/coverage.out good/junit.xml good/bench.txt
+clean: ## Remove generated artifacts
+	rm -f sbom.cdx.json grype.sarif good/coverage.out good/junit.xml good/bench.txt

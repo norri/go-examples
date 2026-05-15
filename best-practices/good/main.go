@@ -14,8 +14,11 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
+
+	_ "modernc.org/sqlite" // pure-Go SQLite driver for the demo in main()
 )
 
 // (1) Read the token from the environment rather than hard-coding it.
@@ -61,6 +64,27 @@ func query(ctx context.Context, db *sql.DB, userID string) ([]string, error) {
 		return nil, fmt.Errorf("rows: %w", err)
 	}
 	return names, nil
+}
+
+// runQueryDemo spins up an in-memory SQLite DB so main can exercise query
+// without external infrastructure.
+func runQueryDemo(ctx context.Context) error {
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		return fmt.Errorf("open: %w", err)
+	}
+	defer func() { _ = db.Close() }()
+	if _, err := db.ExecContext(ctx,
+		`CREATE TABLE users (id TEXT PRIMARY KEY, name TEXT);
+		 INSERT INTO users VALUES ('1', 'ada');`); err != nil {
+		return fmt.Errorf("seed: %w", err)
+	}
+	names, err := query(ctx, db, "1")
+	if err != nil {
+		return err
+	}
+	fmt.Println("users:", names)
+	return nil
 }
 
 // hashSecret uses SHA-256 instead of MD5.
@@ -154,14 +178,20 @@ func main() {
 	if _, err := fetch(ctx, "https://example.com"); err != nil {
 		fmt.Fprintln(os.Stderr, "fetch:", err)
 	}
-	if _, err := query(ctx, nil, "1"); err != nil {
+	if err := runQueryDemo(ctx); err != nil {
 		fmt.Fprintln(os.Stderr, "query:", err)
 	}
 	_ = hashSecret("hunter2")
 	if _, err := pickToken(); err != nil {
 		fmt.Fprintln(os.Stderr, "token:", err)
 	}
-	if err := writeReport("/tmp/out", "hi"); err != nil {
+	dir, err := os.MkdirTemp("", "best-practices-")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "tempdir:", err)
+		return
+	}
+	defer func() { _ = os.RemoveAll(dir) }()
+	if err := writeReport(filepath.Join(dir, "report.txt"), "hi"); err != nil {
 		fmt.Fprintln(os.Stderr, "write:", err)
 	}
 	_ = process([]string{"a", "bb", "ccc"}, 1)
