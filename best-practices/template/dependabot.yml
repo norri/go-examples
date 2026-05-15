@@ -1,0 +1,17 @@
+# Keep direct dependencies up to date automatically.
+# Docs: https://docs.github.com/en/code-security/dependabot
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: "/best-practices"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      go-deps:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
