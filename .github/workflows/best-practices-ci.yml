@@ -156,6 +156,7 @@ jobs:
         with:
           work-dir: best-practices/good
           go-version-file: best-practices/go.mod
+          repo-checkout: false
 
   # ---------------------------------------------------------------------------
   # 5. gosec - Go security smells, results uploaded as SARIF.
