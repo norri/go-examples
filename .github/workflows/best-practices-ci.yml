@@ -11,11 +11,11 @@ on:
     branches: [main]
     paths:
       - "best-practices/**"
-      - ".github/workflows/best_practices.yml"
+      - ".github/workflows/best-practices-ci.yml"
   pull_request:
     paths:
       - "best-practices/**"
-      - ".github/workflows/best_practices.yml"
+      - ".github/workflows/best-practices-ci.yml"
   schedule:
     # Weekly run catches newly disclosed CVEs without a code change.
     - cron: "17 6 * * 1"

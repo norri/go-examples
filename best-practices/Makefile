@@ -12,6 +12,7 @@ SBOM_VERSION ?= 0.1.0
 .PHONY: help \
         demo-good demo-bad \
         sbom-vuln \
+        docker-build \
         install-tools clean
 
 # ---------- entry points ----------
@@ -41,6 +42,16 @@ demo-bad: ## Run the full pipeline against bad/ (expected to flag issues)
 sbom-vuln: ## Supply chain scan with syft + grype for go.mod + go.sum (both good/ and bad/ use the same dependencies)
 	syft . --source-name $(SBOM_NAME) --source-version $(SBOM_VERSION) -o cyclonedx-json=sbom.cdx.json
 	grype sbom.cdx.json
+
+# ---------- container ----------
+docker-build: ## Smoke-test the template Dockerfile against good/
+	@tmp=$$(mktemp -d) && \
+	  trap "rm -rf $$tmp" EXIT && \
+	  cp template/Dockerfile template/.dockerignore go.mod go.sum $$tmp/ && \
+	  cp -r good $$tmp/ && \
+	  sed -i.bak 's|\./\.\.\.|./good|' $$tmp/Dockerfile && rm $$tmp/Dockerfile.bak && \
+	  docker build -t best-practices-good $$tmp && \
+	  docker run --rm best-practices-good
 
 # ---------- utilities ----------
 install-tools: ## Install all CLI tools (delegates to template/Makefile)

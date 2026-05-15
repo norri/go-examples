@@ -1,0 +1,29 @@
+# Keep build context small — Docker copies this dir as the build context
+# for every `docker build`. Anything not needed at build time should be here.
+
+# VCS
+.git
+.gitignore
+.github
+
+# Editor / OS noise
+.vscode
+.idea
+.DS_Store
+
+# Build & test artifacts
+coverage.out
+junit.xml
+bench.txt
+sbom.cdx.json
+gosec.sarif
+grype.sarif
+
+# Local-only files
+*.md
+LICENSE
+Dockerfile
+.dockerignore
+.golangci.yml
+.pre-commit-config.yaml
+Makefile

@@ -1,5 +1,5 @@
-# Copy this Makefile (plus the sibling .golangci.yml and dependabot.yml)
-# into a new Go project. All targets operate on ./... — no demo-specific paths.
+# Copy this Makefile (plus the sibling .golangci.yml) into a new Go project.
+# All targets operate on ./... — no demo-specific paths.
 #
 # Bootstrap with `make install-tools`.
 
